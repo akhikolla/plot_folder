@@ -20,7 +20,7 @@ import glob
 import matplotlib.pyplot as plt
 import sys
 import os
-from function import *
+from impfun import *
 from sklearn import preprocessing
 from spp_model import *
 
@@ -48,7 +48,7 @@ def SplitFolder(labels, folders, fold_id):
 split_list = []
 accurays = []
 for i in range(0,9):
-    dir_path = sys.argv[1]#"/Users/akhilachowdarykolla/Desktop/neuroblastoma-data/data/detailed/cv/sequenceID/testFolds/1"
+    dir_path = sys.argv[1] #"/Users/akhilachowdarykolla/Desktop/neuroblastoma-data/data/detailed/cv/sequenceID/testFolds/1"
     model_id = str(i)   
         ## load the realating csv file
     dir_path_split = dir_path.split("cv")
@@ -63,7 +63,7 @@ for i in range(0,9):
     #init the model parameter
     criterion = SquareHingeLoss()
     step = 5e-5
-    epoch = 1
+    epoch = 10000
     eps = epoch
     model_id_int = int(model_id)
     model = model_list[model_id_int]
@@ -214,11 +214,11 @@ for i in range(0,9):
                 model.eval()
                 outputs = model(data)                    
                 loss = criterion(outputs, label)
-                print("numpy : ",loss.cpu().data.numpy())
+                #print("numpy : ",loss.cpu().data.numpy())
                 test_losses.append(loss.cpu().data.numpy())
     
-        print(np.average(test_losses))
-        print("min vale:",min(test_losses))    
+        #print(np.average(test_losses))
+        #print("min vale:",min(test_losses))    
         test_outputs = np.array(test_outputs)
         
         
@@ -230,19 +230,46 @@ for i in range(0,9):
     best_output = test_outputs[best_parameter_value]
     best_output_list.append(best_output)     
 
-        # plot
-    plt.plot(subtrain_losses, label = 'Training loss')
-    plt.plot(valid_losses, label = 'Validation loss')
-    plt.scatter(min_train_index, min_loss_train, label = 'min train value', color='green')
-    plt.scatter(best_parameter_value, min_loss_valid, label = 'min valid value', color='black')
-    plt.legend(frameon=False)
-    plt.xlabel("step of every 10 min-bath")
-    plt.ylabel("loss")
+
+    epochs = range(1,20)
+    print("avg sub train loss",avg_subtrain_loss)
+    print("avg valid loss",avg_valid_loss)
+    plt.plot(avg_subtrain_loss, label = 'Training loss')
+    plt.plot(avg_valid_loss, label = 'Validation loss')
+
+#plt.plot(epochs,subtrain_losses, label = 'Training loss')
+#plt.plot(epochs,valid_losses, label = 'Validation loss')
+#plt.scatter(min_train_index, min_loss_train, label = 'min train value', color='green')
+#plt.scatter(best_parameter_value, min_loss_valid, label = 'min valid value', color='yellow')
+#plt.legend(frameon=False)
+#plt.xlabel("step of the batch")
+#plt.ylabel("loss")
+#plt.show()
+    plt.title('Training and Validation loss')
+    plt.xlabel('Epochs')	
+    plt.ylabel('Loss')
+    plt.legend()
     plt.show()
     main_path_split = dir_path_split[0].split("/data/")
     main_name = main_path_split[1]
+    main_name =  main_name.split("/")[0]
     sub_name = dir_path.split("cv/")[1].split("/testFolds")[0]
-    plt.savefig('plot_folder/' + str(eps)+ "itr-loss" + '_' + "main_name" +  "_" + "sub_name" + '.png')
+    plt.savefig('plot_folder/' +"avg_model_id" + model_id +  str(eps)+ "itr-loss" + '_' + main_name +  "_" + sub_name + '.png')
+
+
+        # plot
+   # plt.plot(subtrain_losses, label = 'Training loss')
+   # plt.plot(valid_losses, label = 'Validation loss')
+    #plt.scatter(min_train_index, min_loss_train, label = 'min train value', color='green')
+    #plt.scatter(best_parameter_value, min_loss_valid, label = 'min valid value', color='black')
+    #plt.legend(frameon=False)
+    #plt.xlabel("step of every 10 min-bath")
+    #plt.ylabel("loss")
+    #plt.show()
+    #main_path_split = dir_path_split[0].split("/data/")
+    #main_name = main_path_split[1]
+    #sub_name = dir_path.split("cv/")[1].split("/testFolds")[0]
+    #plt.savefig('plot_folder/' + str(eps)+ "itr-loss" + '_' + "main_name" +  "_" + "sub_name" + '.png')
             
 #     # test data
 #     with torch.no_grad():
